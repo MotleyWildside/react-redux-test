@@ -1,9 +1,10 @@
-import {DECREMENT_CELL, INCREMENT_CELL, PICK_CELL} from "../constants/ActionTypes";
+import {DECREMENT_CELL, INCREMENT_CELL, PICK_CELL, SET_TRANSPARENT_MATRIX} from "../constants/ActionTypes";
 
 const initialState = {
     pickedX: null,
     pickedY: null,
     inputMatrix: [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
+    transparentedMatrix: null,
 };
 
 export default function reducer(state = initialState, action) {
@@ -29,6 +30,8 @@ export default function reducer(state = initialState, action) {
             inputMatrix[state.pickedX][state.pickedY]--;
 
             return {...state, inputMatrix};
+        case SET_TRANSPARENT_MATRIX:
+            return {...state, transparentedMatrix: action.payload};
         default:
             return state;
     }

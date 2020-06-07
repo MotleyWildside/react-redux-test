@@ -2,17 +2,14 @@ import React, {Component} from "react";
 import PropTypes from "prop-types";
 import Button from "../Button/Button";
 import Matrix from "../Matrix/Matrix"
-import {decrementCell, incrementCell} from "../../../actions/matrix";
+import {decrementCell, incrementCell, setTransparantedMatrix} from "../../../actions/matrix";
 import {connect} from "react-redux";
 import Controller from "../../../ApiController/Controller";
+import Tabs from "../Tabs/Tabs";
 class Layout extends Component {
 
     constructor(props, context) {
         super(props, context);
-
-        this.state = {
-            value: 0
-        }
     }
 
     increment() {
@@ -27,13 +24,40 @@ class Layout extends Component {
         const body = {
             "matrix": this.props.matrix,
         };
-        Controller.post("/calculate-matrix", body)
+
+        Controller.post("/calculate-matrix", body).then((resolve) => {
+            this.props.setTransparantedMatrix(resolve.data)
+        });
+    }
+
+    renderMatrix() {
+        switch (this.props.currentTab) {
+            case 0:
+                return <Matrix matrix={this.props.matrix}/>;
+            case 1:
+                return <Matrix showOnly={true} matrix={this.props.outputMatrix}/>
+            default:
+                return null;
+        }
     }
 
     render() {
+        const tabs = [
+            {
+                name: "Создать",
+                condition: !!this.props.matrix
+            },
+            {
+                name: "Получить",
+                condition: !!this.props.outputMatrix
+            }
+        ];
+
         return (
             <div className="Layout">
-                <Matrix value={this.state.value}/>
+                <Tabs tabs={tabs} />
+                <hr style={{border: "none"}}/>
+                {this.renderMatrix()}
                 <hr style={{border: "none"}}/>
                 <div className="Layout__container">
                     <Button text="Меньше" handler={() => this.decrement()}/>
@@ -46,7 +70,7 @@ class Layout extends Component {
     }
 }
 
-export const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = dispatch => {
     return {
         incrementCell: () => {
             dispatch(incrementCell());
@@ -54,6 +78,9 @@ export const mapDispatchToProps = dispatch => {
         decrementCell: () => {
             dispatch(decrementCell());
         },
+        setTransparantedMatrix: (matrix) => {
+            dispatch(setTransparantedMatrix(matrix))
+        }
     };
 };
 
@@ -61,9 +88,11 @@ Layout.propTypes = {
     value: PropTypes.number
 };
 
-export const mapStateToProps = store => {
+const mapStateToProps = store => {
     return {
         matrix: store.matrix.inputMatrix,
+        outputMatrix: store.matrix.transparentedMatrix,
+        currentTab: store.tabs.currentTab,
     };
 };
 

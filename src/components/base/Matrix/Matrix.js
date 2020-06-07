@@ -9,7 +9,9 @@ class Matrix extends Component {
     }
 
     handleBlockClick(e) {
-        this.props.pickCell({pickedX: +e.target.attributes.row.value, pickedY: +e.target.attributes.col.value})
+        if (!this.props.showOnly) {
+            this.props.pickCell({pickedX: +e.target.attributes.row.value, pickedY: +e.target.attributes.col.value})
+        }
     }
 
     render() {
@@ -21,7 +23,7 @@ class Matrix extends Component {
     }
 
     createMatrix() {
-        const { props: { matrix, pickedX, pickedY }} = this;
+        const { props: { matrix, pickedX, pickedY, showOnly }} = this;
 
         let markup = [];
 
@@ -29,7 +31,7 @@ class Matrix extends Component {
             for (let j = 0; j < matrix[i].length; j++) {
                 markup.push(
                     <div
-                        className={`Matrix__block ${i === pickedX && j === pickedY ? "picked" : ""}` }
+                        className={`Matrix__block ${!showOnly && i === pickedX && j === pickedY ? "picked" : ""}` }
                         row={i}
                         col={j}
                         onClick={(e) => this.handleBlockClick(e)}
@@ -42,7 +44,7 @@ class Matrix extends Component {
     }
 }
 
-export const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = dispatch => {
     return {
         pickCell: ({pickedX, pickedY}) => {
             dispatch(pickCell({pickedX, pickedY}));
@@ -50,17 +52,20 @@ export const mapDispatchToProps = dispatch => {
     };
 };
 
-export const mapStateToProps = store => {
+const mapStateToProps = store => {
     return {
-        matrix: store.matrix.inputMatrix,
         pickedX: store.matrix.pickedX,
         pickedY: store.matrix.pickedY,
     };
 };
 
 Matrix.propTypes = {
-    value: PropTypes.number
+    matrix: PropTypes.array,
+    showOnly: PropTypes.bool,
 };
 
+Matrix.defaultProps = {
+    showOnly: false,
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(Matrix);

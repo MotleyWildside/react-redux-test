@@ -1,0 +1,23 @@
+.Tabs {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 16px;
+
+  &__tab {
+    margin: 0 32px;
+    cursor: pointer;
+    user-select: none;
+
+    &.picked {
+      color: #f1c40f;
+    }
+
+    &.disabled {
+      color: #ddd;
+      cursor: not-allowed;
+    }
+  }
+}
